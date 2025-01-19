@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads Generation Dashboard</title>
+    <style>
+        /* General Reset */
+        body, h1, p, table {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Dark Theme Background */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Header Style */
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        /* Info Section */
+        .progress {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background-color: #1e1e1e;
+        }
+
+        .progress div {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            color: #a0a0a0;
+        }
+
+        /* Button Styling */
+        button {
+            display: block;
+            margin: 0 auto 20px auto;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #ffffff;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a045;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background-color: #333;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            color: #ffffff;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        td {
+            color: #d4d4d4;
+        }
+
+        tr:nth-child(even) {
+            background-color: #292929;
+        }
+
+        tr:hover {
+            background-color: #444;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Link Styling */
+        a {
+            color: #4caf50;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #a0a0a0;
+        }
+
+        footer a {
+            color: #4caf50;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            table, th, td {
+                font-size: 0.9rem;
+            }
+
+            .progress div {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Leads Generation Dashboard</h1>
+    </header>
+
+    <div class="container">
+        <!-- Progress Section -->
+        <div class="progress">
+            <div><strong>Last Update:</strong> <span id="last-update">Initializing...</span></div>
+            <div><strong>Scraped Leads Count:</strong> <span id="scraped-count">0</span></div>
+            <div><strong>Errors:</strong> <span id="error-count">0</span></div>
+        </div>
+
+        <!-- Scrape Button -->
+        <button onclick="scrapeAndUpdate()">Scrape and Update Leads</button>
+
+        <!-- Table Section -->
+        <h2>Scraped Leads</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Link</th>
+                    <th>Insights</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody id="leads-table">
+                <!-- Leads will be dynamically loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>Powered by <a href="#">Leads Generator</a> | Updates every 4 hours</p>
+    </footer>
+
+    <script>
+        async function loadLeads() {
+            const response = await fetch('/api/leads');
+            const leads = await response.json();
+
+            const table = document.getElementById('leads-table');
+            table.innerHTML = '';
+
+            leads.forEach(lead => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${lead.name || "N/A"}</td>
+                    <td><a href="${lead.link || "#"}" target="_blank">${lead.link || "N/A"}</a></td>
+                    <td>${lead.insights || "N/A"}</td>
+                    <td>${lead.email || "N/A"}</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        async function fetchProgress() {
+            const response = await fetch('/api/progress');
+            const progress = await response.json();
+
+            document.getElementById('last-update').innerText = progress.last_update || "Initializing...";
+            document.getElementById('scraped-count').innerText = progress.scraped_count || 0;
+            document.getElementById('error-count').innerText = progress.error_count || 0;
+        }
+
+        async function scrapeAndUpdate() {
+            const response = await fetch('/api/scrape', { method: 'POST' });
+            const result = await response.json();
+            alert(result.message);
+
+            // Reload the leads and progress
+            loadLeads();
+            fetchProgress();
+        }
+
+        // Initialize leads and progress on page load
+        window.onload = () => {
+            loadLeads();
+            fetchProgress();
+        };
+    </script>
+</body>
+</html>
