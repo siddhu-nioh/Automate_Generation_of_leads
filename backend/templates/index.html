@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leads Generation Dashboard</title>
     <style>
-        /* General Reset */
+        
         body, h1, p, table {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Dark Theme Background */
+        
         body {
             font-family: 'Arial', sans-serif;
             background-color: #121212;
@@ -21,7 +21,7 @@
             padding: 20px;
         }
 
-        /* Header Style */
+        
         h1 {
             text-align: center;
             font-size: 2.5rem;
@@ -31,7 +31,7 @@
             margin-bottom: 20px;
         }
 
-        /* Info Section */
+        
         .progress {
             text-align: center;
             margin-bottom: 20px;
@@ -47,7 +47,7 @@
             color: #a0a0a0;
         }
 
-        /* Button Styling */
+        
         button {
             display: block;
             margin: 0 auto 20px auto;
@@ -65,7 +65,7 @@
             background-color: #45a045;
         }
 
-        /* Table Styling */
+        
         table {
             width: 100%;
             margin: 20px auto;
@@ -104,7 +104,7 @@
             transition: background-color 0.3s ease;
         }
 
-        /* Link Styling */
+        
         a {
             color: #4caf50;
             text-decoration: none;
@@ -114,7 +114,7 @@
             text-decoration: underline;
         }
 
-        /* Footer */
+        
         footer {
             text-align: center;
             margin-top: 20px;
@@ -126,7 +126,7 @@
             color: #4caf50;
         }
 
-        /* Responsive Design */
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
@@ -148,17 +148,17 @@
     </header>
 
     <div class="container">
-        <!-- Progress Section -->
+        
         <div class="progress">
             <div><strong>Last Update:</strong> <span id="last-update">Initializing...</span></div>
             <div><strong>Scraped Leads Count:</strong> <span id="scraped-count">0</span></div>
             <div><strong>Errors:</strong> <span id="error-count">0</span></div>
         </div>
 
-        <!-- Scrape Button -->
+        
         <button onclick="scrapeAndUpdate()">Scrape and Update Leads</button>
 
-        <!-- Table Section -->
+        
         <h2>Scraped Leads</h2>
         <table border="1">
             <thead>
@@ -170,7 +170,7 @@
                 </tr>
             </thead>
             <tbody id="leads-table">
-                <!-- Leads will be dynamically loaded here -->
+                
             </tbody>
         </table>
     </div>
@@ -213,12 +213,12 @@
             const result = await response.json();
             alert(result.message);
 
-            // Reload the leads and progress
+            
             loadLeads();
             fetchProgress();
         }
 
-        // Initialize leads and progress on page load
+        
         window.onload = () => {
             loadLeads();
             fetchProgress();
