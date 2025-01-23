@@ -7,3 +7,4 @@ gunicorn>=20.1.0,<21.0
 cohere==5.13.8 
 webdriver-manager>=3.5.2,<4.0
 python-dotenv>=0.19.2,<1.0
+apscheduler>=3.6.0,<4.0 
