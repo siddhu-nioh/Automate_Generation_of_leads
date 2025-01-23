@@ -14,9 +14,9 @@ import time
 
 app = Flask(__name__)
 
-# Global variables for tracking progress and state
+
 error_count = 0
-is_running = False  # Flag to track if a job is currently running
+is_running = False  
 
 def get_leads_count():
     """Fetch the total number of rows in the leads table."""
@@ -96,21 +96,21 @@ def scheduled_scraping_job():
     
     if is_running:
         print("Job is already running; skipping this execution.")
-        return  # Exit if another job is running
+        return  
 
     is_running = True
     try:
-        # Check current number of scheduled jobs
-        if len(scheduler.get_jobs()) >= 200:  # Adjust this limit as needed
+        
+        if len(scheduler.get_jobs()) >= 200:  
             print("Maximum number of scheduled jobs reached; removing old jobs.")
-            # Remove old jobs (you can implement your own logic here)
+            
             for job in scheduler.get_jobs():
-                scheduler.remove_job(job.id)  # Remove all jobs or implement specific logic
+                scheduler.remove_job(job.id)  
 
-        # Scrape new data
+        
         scraped_data = scrape_crunchbase()
         
-        # Filter out already existing leads
+        
         new_data = [entry for entry in scraped_data if not is_already_in_db(entry)]
         
         if not new_data:
@@ -132,13 +132,13 @@ def scheduled_scraping_job():
         print(f"Scheduled scraping encountered an error: {str(e)}")
 
     finally:
-        is_running = False  # Reset flag after completion
+        is_running = False  
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(scheduled_scraping_job, 'interval', seconds=45, coalesce=True)  # Adjust interval as necessary
+scheduler.add_job(scheduled_scraping_job, 'interval', seconds=45, coalesce=True)  
 scheduler.start()
 
-initialize_progress()  # Initialize progress on startup
+initialize_progress()  
 
 if __name__ == '__main__':
     app.run(port=5000)
