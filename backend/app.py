@@ -5,7 +5,6 @@ from database import (
     save_to_db,
     fetch_leads,
     is_already_in_db,
-    get_progress_from_db,
     update_progress,
     get_leads_count
 )
@@ -15,36 +14,31 @@ import time
 
 app = Flask(__name__)
 
+# Global variables for tracking progress and state
 error_count = 0
+is_running = False  # Flag to track if a job is currently running
 
 def get_leads_count():
     """Fetch the total number of rows in the leads table."""
     connection = sqlite3.connect('leads.db')
     cursor = connection.cursor()
-
     cursor.execute("SELECT COUNT(*) FROM leads")
     count = cursor.fetchone()[0]
-
     connection.close()
     return count
 
 def initialize_progress():
     """Initialize the scraping progress when the app starts."""
     global last_scraped_time, scraped_count, error_count
-
     last_scraped_time = time.strftime("%Y-%m-%d %H:%M:%S")
-
     scraped_count = get_leads_count()
-
     error_count = 0
-
     print(f"Progress initialized: Last scraped time: {last_scraped_time}, Scraped count: {scraped_count}, Errors: {error_count}")
 
 @app.route('/')
 def index():
     """Render the main dashboard page."""
     return render_template('index.html')
-
 
 @app.route('/api/leads', methods=['GET'])
 def get_leads():
@@ -56,19 +50,18 @@ def get_leads():
     ]
     return jsonify(formatted_leads)
 
-
 @app.route('/api/progress', methods=['GET'])
 def get_progress():
     """Fetch and return the progress of the scraping job."""
     global last_scraped_time, error_count
-
     scraped_count = get_leads_count()
-
+    
     progress = {
-        "last_update": last_scraped_time,  
-        "scraped_count": scraped_count,   
-        "error_count": error_count,       
+        "last_update": last_scraped_time,
+        "scraped_count": scraped_count,
+        "error_count": error_count,
     }
+    
     return jsonify(progress)
 
 @app.route('/api/scrape', methods=['POST'])
@@ -76,20 +69,15 @@ def scrape_and_enrich():
     """Trigger the scraping and enrichment process."""
     global last_scraped_time, scraped_count, error_count
     try:
-        
         scraped_data = scrape_crunchbase()
-
-        
         new_data = [entry for entry in scraped_data if not is_already_in_db(entry)]
 
         if not new_data:
-            return jsonify({"status": "success", "message": "new leads to save."})
+            return jsonify({"status": "success", "message": "No new leads to save."})
 
-        
         enriched_data = enrich_data(new_data)
         save_to_db(enriched_data)
 
-        
         last_scraped_time = time.strftime("%Y-%m-%d %H:%M:%S")
         scraped_count = get_leads_count()
         update_progress(last_scraped_time, scraped_count, error_count)
@@ -101,17 +89,37 @@ def scrape_and_enrich():
         update_progress(last_scraped_time, scraped_count, error_count)
         return jsonify({"status": "error", "message": f"An error occurred: {str(e)}"})
 
-
 def scheduled_scraping_job():
-    """Scheduled job to scrape and enrich data every 4 hours."""
-    global last_scraped_time, scraped_count, error_count
+    """Scheduled job to scrape and enrich data."""
+    
+    global last_scraped_time, scraped_count, error_count, is_running
+    
+    if is_running:
+        print("Job is already running; skipping this execution.")
+        return  # Exit if another job is running
+
+    is_running = True
     try:
+        # Check current number of scheduled jobs
+        if len(scheduler.get_jobs()) >= 200:  # Adjust this limit as needed
+            print("Maximum number of scheduled jobs reached; removing old jobs.")
+            # Remove old jobs (you can implement your own logic here)
+            for job in scheduler.get_jobs():
+                scheduler.remove_job(job.id)  # Remove all jobs or implement specific logic
+
+        # Scrape new data
         scraped_data = scrape_crunchbase()
+        
+        # Filter out already existing leads
         new_data = [entry for entry in scraped_data if not is_already_in_db(entry)]
+        
+        if not new_data:
+            print("No new data to save.")
+            return
+        
         enriched_data = enrich_data(new_data)
         save_to_db(enriched_data)
 
-        
         last_scraped_time = time.strftime("%Y-%m-%d %H:%M:%S")
         scraped_count = get_leads_count()
         update_progress(last_scraped_time, scraped_count, error_count)
@@ -123,14 +131,14 @@ def scheduled_scraping_job():
         update_progress(last_scraped_time, scraped_count, error_count)
         print(f"Scheduled scraping encountered an error: {str(e)}")
 
-
+    finally:
+        is_running = False  # Reset flag after completion
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(scheduled_scraping_job, 'interval', seconds=45)
+scheduler.add_job(scheduled_scraping_job, 'interval', seconds=45, coalesce=True)  # Adjust interval as necessary
 scheduler.start()
 
+initialize_progress()  # Initialize progress on startup
 
-scrape_crunchbase()
-initialize_progress()
 if __name__ == '__main__':
     app.run(port=5000)
