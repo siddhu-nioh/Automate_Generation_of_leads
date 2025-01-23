@@ -1,12 +1,9 @@
-selenium==4.1.0
-
-googlesearch-python==1.1.0
-openai==0.27.0
-beautifulsoup4==4.11.1
-# python-dotenv==0.19.2
-Flask==2.0.3
-gunicorn==20.1.0
-# selenium==4.1.0
-cohere==5.13.8 # Replace with the actual version you're using
-webdriver-manager==3.5.2
-python-dotenv==0.19.2
+selenium>=4.1.0,<5.0
+googlesearch-python>=1.1.0,<2.0
+openai>=0.27.0,<1.0
+beautifulsoup4>=4.11.1,<5.0
+Flask>=2.0.3,<3.0
+gunicorn>=20.1.0,<21.0
+cohere==5.13.8 
+webdriver-manager>=3.5.2,<4.0
+python-dotenv>=0.19.2,<1.0
