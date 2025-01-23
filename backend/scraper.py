@@ -126,45 +126,47 @@ def process_and_store_cohere_data():
 
 
 def scrape_crunchbase():
-    driver_path = ChromeDriverManager().install()
-    service = Service(driver_path)
-    driver = webdriver.Chrome(service=service)
+        
+        # undo the comment for the below code to run the code for actual submission for 4 hoours , marchiopoku ra rey 
+    # driver_path = ChromeDriverManager().install()
+    # service = Service(driver_path)
+    # driver = webdriver.Chrome(service=service)
 
-    driver.get("https://www.crunchbase.com/")
+    # driver.get("https://www.crunchbase.com/")
 
-    wait = WebDriverWait(driver, 30)
-    try:
-        search_box = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/chrome/div/app-header/div[1]/multi-search/form/input")))
-        search_box.send_keys("startups")
-        search_box.send_keys(Keys.RETURN)
-        time.sleep(5)
+    # wait = WebDriverWait(driver, 30)
+    # try:
+    #     search_box = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/chrome/div/app-header/div[1]/multi-search/form/input")))
+    #     search_box.send_keys("startups")
+    #     search_box.send_keys(Keys.RETURN)
+    #     time.sleep(5)
 
-        organizations_section = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/chrome/div/mat-sidenav-container/mat-sidenav-content/div/multi-search-results/page-layout/div/div/div/search-results-section[1]/div/div[2]/span/a")))
-        organizations_section.click()
-        time.sleep(3)
+    #     organizations_section = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/chrome/div/mat-sidenav-container/mat-sidenav-content/div/multi-search-results/page-layout/div/div/div/search-results-section[1]/div/div[2]/span/a")))
+    #     organizations_section.click()
+    #     time.sleep(3)
 
-        data = []
-        startups = driver.find_elements(By.CSS_SELECTOR, ".search-card-title")
+    #     data = []
+    #     startups = driver.find_elements(By.CSS_SELECTOR, ".search-card-title")
 
-        for startup in startups:
-            name = startup.text
-            link = startup.find_element(By.TAG_NAME, "a").get_attribute("href")
+    #     for startup in startups:
+    #         name = startup.text
+    #         link = startup.find_element(By.TAG_NAME, "a").get_attribute("href")
 
-            driver.get(link)
-            time.sleep(3)
-            page_text = driver.find_element(By.TAG_NAME, "body").text
-            emails = extract_emails_from_text(page_text)
+    #         driver.get(link)
+    #         time.sleep(3)
+    #         page_text = driver.find_element(By.TAG_NAME, "body").text
+    #         emails = extract_emails_from_text(page_text)
 
-            email = emails[0] if emails else "No email found"
-            insights = get_cohere_insights(name) if email != "No email found" else "No insights available"
-            data.append({"name": name, "link": link, "email": email, "insights": insights})
+    #         email = emails[0] if emails else "No email found"
+    #         insights = get_cohere_insights(name) if email != "No email found" else "No insights available"
+    #         data.append({"name": name, "link": link, "email": email, "insights": insights})
 
-        driver.quit()
-        return data
-    except Exception as e:
-        # print(f"Error during scraping: {e}")
-        driver.quit()
-        print("Fallback to Cohere for insights generation.")
+    #     driver.quit()
+    #     return data
+    # except Exception as e:
+    #     # print(f"Error during scraping: {e}")
+    #     driver.quit()
+        print("More traffic in crunchBase , Fallback to Cohere for insights generation.")
         process_and_store_cohere_data()  
         return []
 

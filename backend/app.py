@@ -126,7 +126,7 @@ def scheduled_scraping_job():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(scheduled_scraping_job, 'interval', hours=4)
+scheduler.add_job(scheduled_scraping_job, 'interval', seconds=60)
 scheduler.start()
 
 
