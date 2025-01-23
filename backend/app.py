@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template,send_file
 from scraper import scrape_crunchbase
 from enrichment import enrich_data
 from database import (
@@ -11,7 +11,7 @@ from database import (
 from apscheduler.schedulers.background import BackgroundScheduler
 import sqlite3
 import time
-
+import os
 app = Flask(__name__)
 
 
@@ -49,7 +49,14 @@ def get_leads():
         for lead in leads
     ]
     return jsonify(formatted_leads)
-
+@app.route('/api/download-db', methods=['GET'])
+def download_db():
+    """Endpoint to download the SQLite database."""
+    db_path = os.path.join('backend', 'leads.db')  
+    if os.path.exists(db_path):
+        return send_file(db_path, as_attachment=True)
+    else:
+        return jsonify({"error": "Database not found"}), 404
 @app.route('/api/progress', methods=['GET'])
 def get_progress():
     """Fetch and return the progress of the scraping job."""
