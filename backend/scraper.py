@@ -41,6 +41,16 @@ def save_to_db(data):
                        (entry["name"], entry["link"], entry["email"], entry.get("insights", "No insights")))
     conn.commit()
     conn.close()
+def delete_invalid_emails():
+    """Delete leads with 'Not available' or NULL in the email field."""
+    conn = sqlite3.connect("leads.db")
+    cursor = conn.cursor()
+    
+    # Delete rows where email is 'Not available' or NULL
+    cursor.execute("DELETE FROM leads WHERE email = 'Not available' OR email IS NULL OR email = ''")
+    print(f"Deleted {cursor.rowcount} rows")
+    conn.commit()
+    conn.close()
 
 
 def extract_emails_from_text(text):
@@ -174,6 +184,8 @@ def scrape_crunchbase():
 if __name__ == "__main__":
     init_db()
     leads = scrape_crunchbase()
+    
+    delete_invalid_emails()
     if leads:
         save_to_db(leads)
         print("Data saved to database successfully.")
