@@ -1,5 +1,5 @@
 selenium==4.1.0
-sqlite3==3.35.5
+
 googlesearch-python==1.1.0
 openai==0.27.0
 beautifulsoup4==4.11.1
@@ -7,6 +7,6 @@ beautifulsoup4==4.11.1
 Flask==2.0.3
 gunicorn==20.1.0
 # selenium==4.1.0
-cohere==4.0.0  # Replace with the actual version you're using
+cohere==5.13.8 # Replace with the actual version you're using
 webdriver-manager==3.5.2
 python-dotenv==0.19.2
