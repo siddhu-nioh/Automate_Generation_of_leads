@@ -52,7 +52,7 @@ def get_leads():
 @app.route('/api/download-db', methods=['GET'])
 def download_db():
     """Endpoint to download the SQLite database."""
-    db_path = os.path.join('backend', 'leads.db')  
+    db_path = os.path.join('leads.db')  
     if os.path.exists(db_path):
         return send_file(db_path, as_attachment=True)
     else:
